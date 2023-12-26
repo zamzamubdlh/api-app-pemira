@@ -11,6 +11,7 @@ function register() {
     $name = isset($_POST['name']) ? $_POST['name'] : null;
     $email = isset($_POST['email']) ? $_POST['email'] : null;
     $phone = isset($_POST['phone']) ? $_POST['phone'] : null;
+    $age = isset($_POST['age']) ? $_POST['age'] : null;
     $password = isset($_POST['password']) ? $_POST['password'] : null;
     $created_at = date('Y-m-d H:i:s');
     $updated_at = date('Y-m-d H:i:s');
@@ -18,6 +19,7 @@ function register() {
     if ($name === null || empty($name) ||
         $email === null || empty($email) ||
         $phone === null || empty($phone) ||
+        $age === null || empty($age) ||
         $password === null || empty($password)) {
         echo json_encode(array("message" => "Missing required data"));
         return;
@@ -30,14 +32,14 @@ function register() {
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    $stmt = $conn->prepare("INSERT INTO users (name, email, phone, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssss", $name, $email, $phone, $hashed_password, $created_at, $updated_at);
+    $stmt = $conn->prepare("INSERT INTO users (name, email, phone, age, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssss", $name, $email, $phone, $age, $hashed_password, $created_at, $updated_at);
 
     if ($stmt->execute()) {
         $user_id = $stmt->insert_id;
         $stmt->close();
         
-        $stmt = $conn->prepare("SELECT id, name, email, phone, password, created_at, updated_at FROM users WHERE id = ?");
+        $stmt = $conn->prepare("SELECT id, name, email, phone, age, password, created_at, updated_at FROM users WHERE id = ?");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -70,13 +72,7 @@ function login() {
     $conn = connectDB();
     
     if (checkLoginStatus()) {
-        $userId = $_SESSION['id'];
-        $userData = getUserData($conn, $userId);
-
-        echo json_encode(array(
-            "message" => "User already logged in",
-            "data" => $userData
-        ));
+        echo json_encode(array("message" => "User already logged in"));
         return;
     }
 
@@ -106,7 +102,7 @@ function login() {
             echo json_encode(array(
                 "message" => "Login successful",
                 "user" => array(
-                    "idid" => $id,
+                    "id" => $id,
                     "name" => $name,
                     "email" => $email,
                     "phone" => $phone
