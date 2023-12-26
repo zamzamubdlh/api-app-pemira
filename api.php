@@ -33,6 +33,7 @@ switch ($method) {
                 break;
             case "report-fraud":
                 reportFraud();
+                break;
             case "logout":
                 logout();
                 break;
