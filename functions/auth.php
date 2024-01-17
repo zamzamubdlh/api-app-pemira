@@ -98,15 +98,18 @@ function login() {
 
         if (password_verify($password, $hashed_password)) {
             $_SESSION['id'] = $id;
+            $token = generateSessionToken($id);
+            $userData = array(
+                "id" => $id,
+                "name" => $name,
+                "email" => $email,
+                "phone" => $phone
+            );
 
             echo json_encode(array(
                 "message" => "Login successful",
-                "user" => array(
-                    "id" => $id,
-                    "name" => $name,
-                    "email" => $email,
-                    "phone" => $phone
-                )
+                "user" => $userData,
+                "token" => $token
             ));
         } else {
             echo json_encode(array("message" => "Incorrect password"));
@@ -128,6 +131,10 @@ function getUserData($conn, $userId) {
     $stmt->close();
 
     return $userData;
+}
+
+function generateSessionToken($userId) {
+    return md5(uniqid($userId, true));
 }
 
 function logout() {
