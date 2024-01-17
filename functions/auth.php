@@ -87,13 +87,13 @@ function login() {
 
     $email = filter_var($email, FILTER_SANITIZE_EMAIL);
 
-    $stmt = $conn->prepare("SELECT id, name , email, phone, password FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id, name , email, phone, age, password, created_at, updated_at FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id, $name, $email, $phone, $hashed_password);
+        $stmt->bind_result($id, $name, $email, $phone, $age, $hashed_password, $createdAt, $updatedAt);
         $stmt->fetch();
 
         if (password_verify($password, $hashed_password)) {
@@ -103,7 +103,10 @@ function login() {
                 "id" => $id,
                 "name" => $name,
                 "email" => $email,
-                "phone" => $phone
+                "phone" => $phone,
+                "age" => $age,
+                "created_at" => $createdAt,
+                "updated_at" => $updatedAt,
             );
 
             echo json_encode(array(
