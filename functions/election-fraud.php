@@ -57,5 +57,3 @@ function getUserHashedPassword($conn, $userId) {
     
     return $userData;
 }
-
-?>

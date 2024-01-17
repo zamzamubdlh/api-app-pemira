@@ -24,5 +24,3 @@ function checkLoginStatus() {
         return false;
     }
 }
-
-?>

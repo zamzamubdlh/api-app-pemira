@@ -11,5 +11,3 @@ function listPreviousVote() {
     
     $conn->close();
 }
-
-?>

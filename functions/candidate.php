@@ -11,5 +11,3 @@ function getCandidateProfile() {
     
     $conn->close();
 }
-
-?>
