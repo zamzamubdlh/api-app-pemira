@@ -113,6 +113,7 @@ function login() {
                 "age" => $age,
                 "created_at" => $createdAt,
                 "updated_at" => $updatedAt,
+                "token" => $token
             );
 
             $_SESSION['id'] = $id;
