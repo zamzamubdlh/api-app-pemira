@@ -20,7 +20,6 @@ function register() {
     if ($name === null || empty($name) ||
         $email === null || empty($email) ||
         $phone === null || empty($phone) ||
-        $age === null || empty($age) ||
         $password === null || empty($password)) {
         http_response_code(400);
         echo json_encode(array("message" => "Missing required data"));
