@@ -103,7 +103,7 @@ function login() {
         $stmt->fetch();
 
         if (password_verify($password, $hashed_password)) {
-            $_SESSION['id'] = $id;
+
             $token = generateSessionToken($id);
             $userData = array(
                 "id" => $id,
@@ -114,6 +114,9 @@ function login() {
                 "created_at" => $createdAt,
                 "updated_at" => $updatedAt,
             );
+
+            $_SESSION['id'] = $id;
+            $_SESSION['token'] = $token;
 
             http_response_code(200);
             echo json_encode(array(
@@ -135,7 +138,7 @@ function login() {
 }
 
 function getUserData($conn, $userId) {
-    $stmt = $conn->prepare("SELECT id, name, email, phone FROM users WHERE id = ?");
+    $stmt = $conn->prepare("SELECT id, name, email, phone, age, password FROM users WHERE id = ?");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
     $result = $stmt->get_result();

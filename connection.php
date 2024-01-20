@@ -18,7 +18,7 @@ function connectDB() {
 function checkLoginStatus() {
     session_start();
 
-    if (isset($_SESSION['id'])) {
+    if (isset($_SESSION['id']) && isset($_SESSION['token'])) {
         return true;
     } else {
         return false;

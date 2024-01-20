@@ -3,26 +3,29 @@ function reportFraud() {
     $conn = connectDB();
 
     if (!checkLoginStatus()) {
+        http_response_code(401);
         echo json_encode(array("message" => "User not logged in"));
         return;
     }
 
-    $loggedInUserId = $_SESSION['id'];
+    $userData  = checkAuthorization($conn);
+
+    $loggedInUserId = $userData['id'];
 
     $password = isset($_POST['password']) ? $_POST['password'] : null;
     $date = isset($_POST['date']) ? $_POST['date'] : null;
     $description = isset($_POST['description']) ? $_POST['description'] : null;
 
     if ($password === null || $date === null || $description === null) {
+        http_response_code(400);
         echo json_encode(array("message" => "Missing required data"));
         return;
     }
 
-    $userData = getUserHashedPassword($conn, $loggedInUserId);
-
     $isPasswordValid = password_verify($password, $userData['password']);
 
     if (!$isPasswordValid) {
+        http_response_code(403);
         echo json_encode(array("message" => "Incorrect password"));
         return;
     }
@@ -35,11 +38,14 @@ function reportFraud() {
 
     try {
         if ($stmt->execute()) {
+            http_response_code(201);
             echo json_encode(array("message" => "Fraud report submitted successfully"));
         } else {
+            http_response_code(500);
             echo json_encode(array("message" => "Failed to submit fraud report"));
         }
     } catch (mysqli_sql_exception $e) {
+        http_response_code(500);
         echo json_encode(array("message" => "Error occurred: " . $e->getMessage()));
     }
 
@@ -47,13 +53,24 @@ function reportFraud() {
     $conn->close();
 }
 
-function getUserHashedPassword($conn, $userId) {
-    $stmt = $conn->prepare("SELECT id, password FROM users WHERE id = ?");
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $userData = $result->fetch_assoc();
-    $stmt->close();
-    
+function checkAuthorization($conn) {
+    if (!isset($_SESSION['token']) || empty($_SESSION['token'])) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Missing session token"));
+        exit;
+    }
+
+    $clientToken = $_SESSION['token'];
+    $receivedToken = isset($_POST['token']) ? $_POST['token'] : null;
+
+    if ($receivedToken !== $clientToken) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Invalid session token"));
+        exit;
+    }
+
+    $loggedInUserId = $_SESSION['id'];
+    $userData = getUserData($conn, $loggedInUserId);
+
     return $userData;
 }
