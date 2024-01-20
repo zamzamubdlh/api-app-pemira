@@ -4,6 +4,7 @@ function register() {
     $conn = connectDB();
 
     if (checkLoginStatus()) {
+        http_response_code(401);
         echo json_encode(array("message" => "User already logged in"));
         return;
     }
@@ -21,11 +22,13 @@ function register() {
         $phone === null || empty($phone) ||
         $age === null || empty($age) ||
         $password === null || empty($password)) {
+        http_response_code(400);
         echo json_encode(array("message" => "Missing required data"));
         return;
     }
 
     if (isDuplicateUser($conn, $email, $phone)) {
+        http_response_code(403);
         echo json_encode(array("message" => "Email or phone number is already registered"));
         return;
     }
@@ -45,11 +48,13 @@ function register() {
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
 
+        http_response_code(201);
         echo json_encode(array(
             "message" => "Registration successful",
             "data" => $user
         ));
     } else {
+        http_response_code(500);
         echo json_encode(array("message" => "Registration failed"));
     }
 
@@ -72,6 +77,7 @@ function login() {
     $conn = connectDB();
     
     if (checkLoginStatus()) {
+        http_response_code(401);
         echo json_encode(array("message" => "User already logged in"));
         return;
     }
@@ -81,6 +87,7 @@ function login() {
 
     if ($email === null || empty($email) ||
         $password === null || empty($password)) {
+        http_response_code(400);
         echo json_encode(array("message" => "Missing required data"));
         return; 
     }
@@ -109,15 +116,18 @@ function login() {
                 "updated_at" => $updatedAt,
             );
 
+            http_response_code(200);
             echo json_encode(array(
                 "message" => "Login successful",
                 "user" => $userData,
                 "token" => $token
             ));
         } else {
+            http_response_code(403);
             echo json_encode(array("message" => "Incorrect password"));
         }
     } else {
+        http_response_code(422);
         echo json_encode(array("message" => "User not found"));
     }
 
@@ -144,6 +154,7 @@ function logout() {
     $conn = connectDB();
     
     if (!checkLoginStatus()) {
+        http_response_code(401);
         echo json_encode(array("message" => "User not logged in"));
         return;
     }
@@ -151,6 +162,7 @@ function logout() {
     session_unset();
     session_destroy();
 
+    http_response_code(200);
     echo json_encode(array("message" => "Logout successful"));
 
     $conn->close();
