@@ -1,5 +1,7 @@
 <?php
 
+ini_set('session.cookie_secure', true);
+
 function register() {
     $conn = connectDB();
 
@@ -123,7 +125,8 @@ function login() {
             echo json_encode(array(
                 "message" => "Login successful",
                 "user" => $userData,
-                "token" => $token
+                "token" => $token,
+                "id" => $userData['id']
             ));
         } else {
             http_response_code(403);
