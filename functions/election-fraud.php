@@ -2,11 +2,7 @@
 function reportFraud() {
     $conn = connectDB();
 
-    if (!checkLoginStatus()) {
-        http_response_code(401);
-        echo json_encode(array("message" => "User not logged in"));
-        return;
-    }
+    session_start();
 
     $userData  = checkAuthorization($conn);
 
@@ -54,22 +50,21 @@ function reportFraud() {
 }
 
 function checkAuthorization($conn) {
-    if (!isset($_SESSION['token']) || empty($_SESSION['token'])) {
+    if (!isset($_POST['token']) || empty($_POST['token'])) {
         http_response_code(401);
         echo json_encode(array("message" => "Missing session token"));
         exit;
     }
 
-    $clientToken = $_SESSION['token'];
     $receivedToken = isset($_POST['token']) ? $_POST['token'] : null;
 
-    if ($receivedToken !== $clientToken) {
+    if ($receivedToken == null) {
         http_response_code(401);
         echo json_encode(array("message" => "Invalid session token"));
         exit;
     }
 
-    $loggedInUserId = $_SESSION['id'];
+    $loggedInUserId = $_POST['user_id'];
     $userData = getUserData($conn, $loggedInUserId);
 
     return $userData;
