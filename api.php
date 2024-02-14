@@ -37,21 +37,21 @@ switch ($method) {
             case "logout":
                 logout();
                 break;
+            case "list-previous-votes":
+                listPreviousVote();
+                break;
+            case "get-candidate-by-current-year":
+                getCandidateByCurrentYear();
+                break;
         }
         break;
     case 'GET':
         switch ($action) {
-            case "list-previous-votes":
-                listPreviousVote();
-                break;
             case "get-candidate-profile":
                 getCandidateProfile();
                 break;
             case "get-voting-results":
                 getVotingResults();
-                break;
-            case "get-candidate-by-current-year":
-                getCandidateByCurrentYear();
                 break;
         }
         break;
