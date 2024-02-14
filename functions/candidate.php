@@ -125,5 +125,7 @@ function getCandidateByCurrentYear() {
     $conn->close();
 
     http_response_code(200);
-    echo json_encode($candidates);
+    echo json_encode(array(
+        "data" => $candidates
+    ));
 }

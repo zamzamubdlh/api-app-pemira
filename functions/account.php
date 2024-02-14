@@ -31,7 +31,9 @@ function listPreviousVote() {
         $votes[] = $row;
     }
 
-    echo json_encode($votes);
+    echo json_encode(array(
+        "data" => $votes
+    ));
 
     $stmt->close();
     $conn->close();
