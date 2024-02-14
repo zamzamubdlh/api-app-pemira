@@ -3,13 +3,11 @@
 function registerCandidate() {
     $conn = connectDB();
     
-    if (!checkLoginStatus()) {
-        http_response_code(401);
-        echo json_encode(array("message" => "User not logged in"));
-        return;
-    }
+    session_start();
 
-    $userId = $_SESSION['id'];
+    $userData  = checkAuthorization($conn);
+
+    $userId = $userData['id'];
 
     if (isCandidateForYear($userId, date('Y'))) {
         http_response_code(400);
@@ -101,11 +99,9 @@ function getCandidateProfile() {
 function getCandidateByCurrentYear() {
     $conn = connectDB();
     
-    if (!checkLoginStatus()) {
-        http_response_code(401);
-        echo json_encode(array("message" => "User not logged in"));
-        return;
-    }
+    session_start();
+
+    $userData  = checkAuthorization($conn);
 
     $currentYear = date('Y');
 

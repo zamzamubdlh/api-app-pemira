@@ -1,13 +1,13 @@
 <?php
 
 function vote() {
-    if (!checkLoginStatus()) {
-        http_response_code(401);
-        echo json_encode(array("message" => "User not logged in"));
-        return;
-    }
+    $conn = connectDB();
+    
+    session_start();
 
-    $userId = $_SESSION['id'];
+    $userData  = checkAuthorization($conn);
+
+    $userId = $userData['id'];
     $currentYear = date('Y');
 
     if (hasVotedThisYear($userId, $currentYear)) {
