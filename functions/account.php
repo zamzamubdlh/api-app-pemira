@@ -9,19 +9,17 @@ function updateAccount() {
 function listPreviousVote() {
     $conn = connectDB();
 
-    if (!checkLoginStatus()) {
-        http_response_code(401);
-        echo json_encode(array("message" => "User not logged in"));
-        return;
-    }
+    session_start();
 
-    $userId = $_SESSION['id'];
+    $userData  = checkAuthorization($conn);
+
+    $loggedInUserId = $userData['id'];
 
     $stmt = $conn->prepare("SELECT v.id, v.year, c.name AS candidate_name 
                             FROM votes v 
                             INNER JOIN candidates c ON v.candidate_id = c.id 
                             WHERE v.user_id = ?");
-    $stmt->bind_param("i", $userId);
+    $stmt->bind_param("i", $loggedInUserId);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -37,4 +35,25 @@ function listPreviousVote() {
 
     $stmt->close();
     $conn->close();
+}
+
+function checkAuthorization($conn) {
+    if (!isset($_POST['token']) || empty($_POST['token'])) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Missing session token"));
+        exit;
+    }
+
+    $receivedToken = isset($_POST['token']) ? $_POST['token'] : null;
+
+    if ($receivedToken == null) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Invalid session token"));
+        exit;
+    }
+
+    $loggedInUserId = $_POST['user_id'];
+    $userData = getUserData($conn, $loggedInUserId);
+
+    return $userData;
 }
