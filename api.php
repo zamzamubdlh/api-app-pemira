@@ -50,6 +50,9 @@ switch ($method) {
             case "get-voting-results":
                 getVotingResults();
                 break;
+            case "get-candidate-by-current-year":
+                getCandidateByCurrentYear();
+                break;
         }
         break;
     case 'PUT':

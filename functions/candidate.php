@@ -97,3 +97,33 @@ function getCandidateProfile() {
     
     $conn->close();
 }
+
+function getCandidateByCurrentYear() {
+    $conn = connectDB();
+    
+    if (!checkLoginStatus()) {
+        http_response_code(401);
+        echo json_encode(array("message" => "User not logged in"));
+        return;
+    }
+
+    $currentYear = date('Y');
+
+    $conn = connectDB();
+    $stmt = $conn->prepare("SELECT id, name, age, program_study, short_description, vision, mission, photo, reason_for_choice, created_at, updated_at FROM candidates WHERE YEAR(created_at) = ?");
+    $stmt->bind_param("i", $currentYear);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $candidates = array();
+
+    while ($row = $result->fetch_assoc()) {
+        $candidates[] = $row;
+    }
+
+    $stmt->close();
+    $conn->close();
+
+    http_response_code(200);
+    echo json_encode($candidates);
+}
