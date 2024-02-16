@@ -37,7 +37,6 @@ function registerCandidate() {
 
     $targetDirectory = "uploads/";
     $targetFile = $targetDirectory . basename($_POST["photo"]);
-    $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
     if (!file_put_contents($targetFile, $photoBytes)) {
         http_response_code(500);
@@ -45,7 +44,7 @@ function registerCandidate() {
         return;
     }
 
-    $targetFile = $targetDirectory . uniqid() . '.' . $imageFileType;
+    $targetFile = $targetDirectory . uniqid() . '.jpg';
 
     $stmt = $conn->prepare("INSERT INTO candidates (user_id, name, age, program_study, short_description, vision, mission, photo, reason_for_choice, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("issssssssss", $userId, $name, $age, $programStudy, $shortDescription, $vision, $mission, $targetFile, $reasonForChoice, $created_at, $updated_at);
