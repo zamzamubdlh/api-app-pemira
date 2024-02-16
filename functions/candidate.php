@@ -25,43 +25,28 @@ function registerCandidate() {
     $created_at = date('Y-m-d H:i:s');
     $updated_at = date('Y-m-d H:i:s');
 
+    $photoBase64 = isset($_POST['photo']) ? $_POST['photo'] : null;
+
+    if ($photoBase64 === null) {
+        http_response_code(400);
+        echo json_encode(array("message" => "Photo data is missing"));
+        return;
+    }
+
+    $photoBytes = base64_decode($photoBase64);
+
     $targetDirectory = "uploads/";
-    $targetFile = $targetDirectory . basename($_FILES["photo"]["name"]);
-    $uploadOk = 1;
-    $imageFileType = strtolower(pathinfo($targetFile,PATHINFO_EXTENSION));
+    $targetFile = $targetDirectory . basename($_POST["photo"]);
+    $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-    $check = getimagesize($_FILES["photo"]["tmp_name"]);
-    if ($check === false) {
-        http_response_code(400);
-        echo json_encode(array("message" => "File is not an image."));
-        return;
-    }
-
-    if (file_exists($targetFile)) {
-        http_response_code(400);
-        echo json_encode(array("message" => "Sorry, file already exists."));
-        return;
-    }
-
-    if ($_FILES["photo"]["size"] > 50000) {
+    if (!file_put_contents($targetFile, $photoBytes)) {
         http_response_code(500);
-        echo json_encode(array("message" => "Sorry, your file is too large."));
+        echo json_encode(array("message" => "Failed to save photo on server"));
         return;
     }
 
-    if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
-        http_response_code(500);
-        echo json_encode(array("message" => "Sorry, only JPG, JPEG, & PNG files are allowed."));
-        return;
-    }
+    $targetFile = $targetDirectory . uniqid() . '.' . $imageFileType;
 
-    if (!move_uploaded_file($_FILES["photo"]["tmp_name"], $targetFile)) {
-        http_response_code(500);
-        echo json_encode(array("message" => "Sorry, there was an error uploading your file."));
-        return;
-    }
-
-    $conn = connectDB();
     $stmt = $conn->prepare("INSERT INTO candidates (user_id, name, age, program_study, short_description, vision, mission, photo, reason_for_choice, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("issssssssss", $userId, $name, $age, $programStudy, $shortDescription, $vision, $mission, $targetFile, $reasonForChoice, $created_at, $updated_at);
 
