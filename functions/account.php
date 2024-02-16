@@ -15,7 +15,7 @@ function listPreviousVote() {
 
     $loggedInUserId = $userData['id'];
 
-    $stmt = $conn->prepare("SELECT v.id, v.year, c.name AS candidate_name 
+    $stmt = $conn->prepare("SELECT v.id, v.year, c.name AS candidate_name, v.user_id 
                             FROM votes v 
                             INNER JOIN candidates c ON v.candidate_id = c.id 
                             WHERE v.user_id = ?");
