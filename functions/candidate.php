@@ -88,7 +88,7 @@ function getCandidateByCurrentYear() {
     $currentYear = date('Y');
 
     $conn = connectDB();
-    $stmt = $conn->prepare("SELECT id, name, age, program_study, short_description, vision, mission, photo, reason_for_choice, created_at, updated_at FROM candidates WHERE YEAR(created_at) = ?");
+    $stmt = $conn->prepare("SELECT id, user_id, name, age, program_study, short_description, vision, mission, photo, reason_for_choice, created_at, updated_at FROM candidates WHERE YEAR(created_at) = ?");
     $stmt->bind_param("i", $currentYear);
     $stmt->execute();
     $result = $stmt->get_result();
