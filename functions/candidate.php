@@ -36,15 +36,13 @@ function registerCandidate() {
     $photoBytes = base64_decode($photoBase64);
 
     $targetDirectory = "uploads/";
-    $targetFile = $targetDirectory . basename($_POST["photo"]);
+    $targetFile = $targetDirectory . uniqid() . '.jpg';
 
     if (!file_put_contents($targetFile, $photoBytes)) {
         http_response_code(500);
         echo json_encode(array("message" => "Failed to save photo on server"));
         return;
     }
-
-    $targetFile = $targetDirectory . uniqid() . '.jpg';
 
     $stmt = $conn->prepare("INSERT INTO candidates (user_id, name, age, program_study, short_description, vision, mission, photo, reason_for_choice, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("issssssssss", $userId, $name, $age, $programStudy, $shortDescription, $vision, $mission, $targetFile, $reasonForChoice, $created_at, $updated_at);
