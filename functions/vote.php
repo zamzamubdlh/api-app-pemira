@@ -62,6 +62,33 @@ function addVoteEntry($userId, $year, $candidateId) {
 
 function getVotingResults() {
     $conn = connectDB();
-    
-    $conn->close();
+
+    $query = "SELECT c.id as candidate_id, c.name as candidate_name, COUNT(v.id) as total_votes 
+              FROM candidates c
+              LEFT JOIN votes v ON c.id = v.candidate_id
+              GROUP BY c.id";
+
+    $result = $conn->query($query);
+
+    if ($result) {
+        $votingResults = array();
+
+        while ($row = $result->fetch_assoc()) {
+            $votingResults[] = array(
+                "candidate_id" => $row['candidate_id'],
+                "candidate_name" => $row['candidate_name'],
+                "total_votes" => $row['total_votes']
+            );
+        }
+
+        $conn->close();
+
+        http_response_code(200);
+        echo json_encode(array(
+            "data" => $votingResults
+        ));
+    } else {
+        http_response_code(500);
+        echo json_encode(array("message" => "Failed to fetch voting results"));
+    }
 }
