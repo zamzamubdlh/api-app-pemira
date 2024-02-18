@@ -72,10 +72,33 @@ function isCandidateForYear($userId, $year) {
     return $rowCount > 0;
 }
 
-function getCandidateProfile() {
+function getCandidateProfile($userId) {
     $conn = connectDB();
-    
+
+    $stmt = $conn->prepare("SELECT id, name, age, program_study, short_description, vision, mission, photo, reason_for_choice, created_at, updated_at FROM candidates WHERE user_id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $candidate = $result->fetch_assoc();
+
+    $stmt->close();
     $conn->close();
+
+    if ($candidate) {
+        http_response_code(200);
+        echo json_encode(array(
+            "data" => $candidate
+        ));
+    } else {
+        http_response_code(404);
+        echo json_encode(array("message" => "Candidate not found"));
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'getCandidateProfile' && isset($_GET['userId'])) {
+    $userId = $_GET['userId'];
+    getCandidateProfile($userId);
 }
 
 function getCandidateByCurrentYear() {
