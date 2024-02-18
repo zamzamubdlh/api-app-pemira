@@ -43,22 +43,18 @@ switch ($method) {
             case "get-candidate-by-current-year":
                 getCandidateByCurrentYear();
                 break;
+            case "get-voting-results":
+                getVotingResults();
+                break;
+            case "update-account":
+                updateAccount();
+                break;
         }
         break;
     case 'GET':
         switch ($action) {
             case "get-candidate-profile":
-                getCandidateProfile();
-                break;
-            case "get-voting-results":
-                getVotingResults();
-                break;
-        }
-        break;
-    case 'PUT':
-        switch ($action) {
-            case "update-account":
-                updateAccount();
+                getCandidateProfile($_GET['userId']);
                 break;
         }
         break;
