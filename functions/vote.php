@@ -92,3 +92,5 @@ function getVotingResults() {
         echo json_encode(array("message" => "Failed to fetch voting results"));
     }
 }
+
+getVotingResults();
